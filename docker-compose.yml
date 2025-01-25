@@ -1,0 +1,20 @@
+services:
+  neo4j:
+    # Pin to 5.15-community for stable vector index support (requires 5.11+)
+    image: neo4j:5.15-community
+    container_name: neo4j-database
+    ports:
+      - '7474:7474' # HTTP
+      - '7687:7687' # Bolt
+    environment:
+      - NEO4J_AUTH=${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-password}
+    volumes:
+      - ${NEO4J_DATA_PATH:-./.neo4j}/data:/data
+      - ${NEO4J_DATA_PATH:-./.neo4j}/logs:/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-O', '/dev/null', 'http://localhost:7474']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

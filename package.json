@@ -1,0 +1,148 @@
+{
+  "name": "sf-graph",
+  "version": "0.1.0",
+  "description": "Salesforce CLI plugin that maps Salesforce org schema to a Neo4j graph database",
+  "main": "dist/index.js",
+  "type": "module",
+  "author": "Nathan Want",
+  "license": "MIT",
+  "homepage": "https://github.com/nwant/sf-graph",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nwant/sf-graph.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nwant/sf-graph/issues"
+  },
+  "keywords": [
+    "salesforce",
+    "cli",
+    "plugin",
+    "graph",
+    "neo4j",
+    "metadata",
+    "schema",
+    "oclif"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "/dist",
+    "/messages",
+    "/oclif.manifest.json"
+  ],
+  "oclif": {
+    "commands": "./dist/cli/commands",
+    "bin": "sf",
+    "topicSeparator": " ",
+    "devPlugins": [
+      "@oclif/plugin-help"
+    ],
+    "topics": {
+      "graph": {
+        "description": "Commands to work with the Salesforce metadata graph"
+      },
+      "graph:objects": {
+        "description": "Explore objects in the metadata graph"
+      },
+      "graph:ai": {
+        "description": "AI-powered schema exploration and SOQL generation"
+      },
+      "graph:mcp": {
+        "description": "Invoke MCP tools directly from the CLI"
+      },
+      "graph:org": {
+        "description": "Manage orgs and compare schemas"
+      },
+      "graph:config": {
+        "description": "Manage sf-graph agent configuration"
+      },
+      "graph:db": {
+        "description": "Manage graph database directly (indexes, queries)"
+      },
+      "graph:docs": {
+        "description": "Manage standard object documentation"
+      }
+    },
+    "flexibleTaxonomy": true
+  },
+  "scripts": {
+    "build": "tsc -b && npm run postbuild",
+    "postbuild": "cp -r src/data dist/",
+    "clean": "rm -rf dist",
+    "compile": "tsc -b",
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec 'npm run build && node dist/server.js'",
+    "dev:server": "nodemon src/server.ts",
+    "mcp": "node dist/mcp-server.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/e2e --testMatch '**/*.test.js'",
+    "test:evals": "node dist/eval/run-evaluation.js",
+    "prepare": "husky install",
+    "postpack": "rm -f oclif.manifest.json",
+    "prepack": "npm run build && oclif manifest"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,json,md}": [
+      "prettier --write"
+    ],
+    "**/*.{js,ts}": [
+      "eslint --fix"
+    ]
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@google/generative-ai": "^0.24.1",
+    "@hapi/hapi": "^21.3.2",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/vision": "^7.0.3",
+    "@inquirer/confirm": "^6.0.3",
+    "@jetstreamapp/soql-parser-js": "^6.3.1",
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "@oclif/core": "^4.8.0",
+    "@salesforce/core": "^8.24.0",
+    "@salesforce/sf-plugins-core": "^12.2.6",
+    "@types/node-fetch": "^2.6.13",
+    "archy": "^1.0.0",
+    "cheerio": "^1.1.2",
+    "hapi-swagger": "^17.1.0",
+    "inquirer": "^9.3.8",
+    "joi": "^17.11.0",
+    "jsforce": "^3.10.10",
+    "neo-blessed": "^0.2.0",
+    "neo4j-driver": "^5.15.0",
+    "node-fetch": "^2.7.0",
+    "ollama": "^0.5.15",
+    "openai": "^6.15.0",
+    "pino": "^10.1.0",
+    "pino-pretty": "^13.1.3",
+    "xml2js": "^0.6.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@jest/globals": "^29.7.0",
+    "@types/archy": "^0.0.36",
+    "@types/blessed": "^0.1.27",
+    "@types/hapi__hapi": "^20.0.13",
+    "@types/hapi__inert": "^5.2.10",
+    "@types/hapi__vision": "^5.5.8",
+    "@types/inquirer": "^9.0.9",
+    "@types/node": "^20",
+    "@types/xml2js": "^0.4.14",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^16.2.7",
+    "nodemon": "^3.0.2",
+    "oclif": "^4",
+    "prettier": "^3.7.4",
+    "typescript": "^5"
+  }
+}

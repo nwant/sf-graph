@@ -1,0 +1,426 @@
+[
+  {
+    "id": "simple-001",
+    "question": "Show me all accounts",
+    "soql": "SELECT Id, Name FROM Account",
+    "complexity": "simple",
+    "patterns": ["simple"],
+    "objects": ["Account"],
+    "explanation": "Basic query selecting standard fields from Account"
+  },
+  {
+    "id": "simple-002",
+    "question": "List all contacts with their email addresses",
+    "soql": "SELECT Id, FirstName, LastName, Email FROM Contact",
+    "complexity": "simple",
+    "patterns": ["simple"],
+    "objects": ["Contact"]
+  },
+  {
+    "id": "filter-001",
+    "question": "Find opportunities worth more than 100000",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity WHERE Amount > 100000",
+    "complexity": "simple",
+    "patterns": ["filter"],
+    "objects": ["Opportunity"],
+    "explanation": "Numeric comparison filter on Amount"
+  },
+  {
+    "id": "filter-002",
+    "question": "Show me closed won opportunities",
+    "soql": "SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE StageName = 'Closed Won'",
+    "complexity": "simple",
+    "patterns": ["filter"],
+    "objects": ["Opportunity"]
+  },
+  {
+    "id": "filter-003",
+    "question": "Find accounts in New York or California",
+    "soql": "SELECT Id, Name, BillingState FROM Account WHERE BillingState IN ('NY', 'CA')",
+    "complexity": "simple",
+    "patterns": ["filter", "in-clause"],
+    "objects": ["Account"]
+  },
+  {
+    "id": "like-001",
+    "question": "Find contacts whose last name starts with Smith",
+    "soql": "SELECT Id, FirstName, LastName FROM Contact WHERE LastName LIKE 'Smith%'",
+    "complexity": "simple",
+    "patterns": ["filter", "like"],
+    "objects": ["Contact"]
+  },
+  {
+    "id": "parent-001",
+    "question": "Show contacts with their account names",
+    "soql": "SELECT Id, FirstName, LastName, Account.Name FROM Contact",
+    "complexity": "medium",
+    "patterns": ["parent-lookup", "join"],
+    "objects": ["Contact", "Account"],
+    "explanation": "Parent relationship traversal using dot notation"
+  },
+  {
+    "id": "parent-002",
+    "question": "List opportunities with their account industry",
+    "soql": "SELECT Id, Name, Amount, Account.Industry FROM Opportunity",
+    "complexity": "medium",
+    "patterns": ["parent-lookup", "join"],
+    "objects": ["Opportunity", "Account"]
+  },
+  {
+    "id": "parent-003",
+    "question": "Show cases with owner name and account name",
+    "soql": "SELECT Id, Subject, Owner.Name, Account.Name FROM Case",
+    "complexity": "medium",
+    "patterns": ["parent-lookup", "join"],
+    "objects": ["Case", "Account", "User"]
+  },
+  {
+    "id": "child-001",
+    "question": "Get accounts with their contacts",
+    "soql": "SELECT Id, Name, (SELECT Id, FirstName, LastName FROM Contacts) FROM Account",
+    "complexity": "medium",
+    "patterns": ["child-subquery", "join"],
+    "objects": ["Account", "Contact"],
+    "explanation": "Child relationship subquery using 'Contacts' relationship name"
+  },
+  {
+    "id": "child-002",
+    "question": "Show accounts with their opportunities",
+    "soql": "SELECT Id, Name, (SELECT Id, Name, Amount FROM Opportunities) FROM Account",
+    "complexity": "medium",
+    "patterns": ["child-subquery", "join"],
+    "objects": ["Account", "Opportunity"]
+  },
+  {
+    "id": "child-003",
+    "question": "List opportunities with their line items",
+    "soql": "SELECT Id, Name, (SELECT Id, Quantity, UnitPrice FROM OpportunityLineItems) FROM Opportunity",
+    "complexity": "medium",
+    "patterns": ["child-subquery", "join"],
+    "objects": ["Opportunity", "OpportunityLineItem"]
+  },
+  {
+    "id": "subquery-001",
+    "question": "Find accounts that have at least one opportunity",
+    "soql": "SELECT Id, Name FROM Account WHERE Id IN (SELECT AccountId FROM Opportunity)",
+    "complexity": "medium",
+    "patterns": ["subquery"],
+    "objects": ["Account", "Opportunity"],
+    "explanation": "Semi-join subquery to filter parent by child existence"
+  },
+  {
+    "id": "subquery-002",
+    "question": "Show contacts whose accounts are in the Technology industry",
+    "soql": "SELECT Id, FirstName, LastName FROM Contact WHERE AccountId IN (SELECT Id FROM Account WHERE Industry = 'Technology')",
+    "complexity": "medium",
+    "patterns": ["subquery", "filter"],
+    "objects": ["Contact", "Account"]
+  },
+  {
+    "id": "subquery-003",
+    "question": "Find opportunities where the account has more than 100 employees",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity WHERE AccountId IN (SELECT Id FROM Account WHERE NumberOfEmployees > 100)",
+    "complexity": "medium",
+    "patterns": ["subquery", "filter"],
+    "objects": ["Opportunity", "Account"]
+  },
+  {
+    "id": "aggregate-001",
+    "question": "Count the total number of accounts",
+    "soql": "SELECT COUNT(Id) FROM Account",
+    "complexity": "simple",
+    "patterns": ["aggregate"],
+    "objects": ["Account"]
+  },
+  {
+    "id": "aggregate-002",
+    "question": "What is the total value of all opportunities?",
+    "soql": "SELECT SUM(Amount) FROM Opportunity",
+    "complexity": "simple",
+    "patterns": ["aggregate"],
+    "objects": ["Opportunity"]
+  },
+  {
+    "id": "aggregate-003",
+    "question": "Show the average opportunity amount by stage",
+    "soql": "SELECT StageName, AVG(Amount) FROM Opportunity GROUP BY StageName",
+    "complexity": "medium",
+    "patterns": ["aggregate", "group-by"],
+    "objects": ["Opportunity"],
+    "explanation": "Aggregate with GROUP BY for per-stage analysis"
+  },
+  {
+    "id": "aggregate-004",
+    "question": "Count opportunities per account",
+    "soql": "SELECT Account.Name, COUNT(Id) FROM Opportunity GROUP BY Account.Name",
+    "complexity": "medium",
+    "patterns": ["aggregate", "group-by", "parent-lookup"],
+    "objects": ["Opportunity", "Account"]
+  },
+  {
+    "id": "aggregate-005",
+    "question": "Show total opportunity amount per industry",
+    "soql": "SELECT Account.Industry, SUM(Amount) FROM Opportunity GROUP BY Account.Industry",
+    "complexity": "medium",
+    "patterns": ["aggregate", "group-by", "parent-lookup"],
+    "objects": ["Opportunity", "Account"]
+  },
+  {
+    "id": "polymorphic-001",
+    "question": "Get the phone number if the event is related to an Account, or the amount if related to an Opportunity",
+    "soql": "SELECT TYPEOF What WHEN Account THEN Phone WHEN Opportunity THEN Amount END FROM Event",
+    "complexity": "complex",
+    "patterns": ["polymorphic", "typeof"],
+    "objects": ["Event", "Account", "Opportunity"],
+    "explanation": "TYPEOF syntax for polymorphic field resolution"
+  },
+  {
+    "id": "polymorphic-002",
+    "question": "Show tasks with the related account or contact name",
+    "soql": "SELECT Id, Subject, TYPEOF WhoId WHEN Contact THEN FirstName, LastName WHEN Lead THEN Name END FROM Task",
+    "complexity": "complex",
+    "patterns": ["polymorphic", "typeof"],
+    "objects": ["Task", "Contact", "Lead"]
+  },
+  {
+    "id": "polymorphic-003",
+    "question": "List events with what they're related to",
+    "soql": "SELECT Id, Subject, What.Type, What.Name FROM Event WHERE What.Type IN ('Account', 'Opportunity')",
+    "complexity": "complex",
+    "patterns": ["polymorphic", "filter"],
+    "objects": ["Event", "Account", "Opportunity"],
+    "explanation": "Filter by polymorphic field type"
+  },
+  {
+    "id": "date-001",
+    "question": "Show opportunities closing this month",
+    "soql": "SELECT Id, Name, CloseDate FROM Opportunity WHERE CloseDate = THIS_MONTH",
+    "complexity": "simple",
+    "patterns": ["filter", "date-literal"],
+    "objects": ["Opportunity"],
+    "explanation": "SOQL date literal for current month"
+  },
+  {
+    "id": "date-002",
+    "question": "Find accounts created in the last 30 days",
+    "soql": "SELECT Id, Name, CreatedDate FROM Account WHERE CreatedDate = LAST_N_DAYS:30",
+    "complexity": "simple",
+    "patterns": ["filter", "date-literal"],
+    "objects": ["Account"]
+  },
+  {
+    "id": "date-003",
+    "question": "Show opportunities closing next quarter",
+    "soql": "SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE CloseDate = NEXT_QUARTER",
+    "complexity": "simple",
+    "patterns": ["filter", "date-literal"],
+    "objects": ["Opportunity"]
+  },
+  {
+    "id": "date-004",
+    "question": "Find cases opened this fiscal year",
+    "soql": "SELECT Id, Subject, CreatedDate FROM Case WHERE CreatedDate = THIS_FISCAL_YEAR",
+    "complexity": "simple",
+    "patterns": ["filter", "date-literal"],
+    "objects": ["Case"]
+  },
+  {
+    "id": "order-001",
+    "question": "Show top 10 opportunities by amount",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity ORDER BY Amount DESC LIMIT 10",
+    "complexity": "simple",
+    "patterns": ["order-by", "limit"],
+    "objects": ["Opportunity"]
+  },
+  {
+    "id": "order-002",
+    "question": "List the 5 most recently created accounts",
+    "soql": "SELECT Id, Name, CreatedDate FROM Account ORDER BY CreatedDate DESC LIMIT 5",
+    "complexity": "simple",
+    "patterns": ["order-by", "limit"],
+    "objects": ["Account"]
+  },
+  {
+    "id": "complex-001",
+    "question": "Show accounts with at least one closed-won opportunity in the last year",
+    "soql": "SELECT Id, Name FROM Account WHERE Id IN (SELECT AccountId FROM Opportunity WHERE StageName = 'Closed Won' AND CloseDate = LAST_N_DAYS:365)",
+    "complexity": "complex",
+    "patterns": ["subquery", "filter", "date-literal"],
+    "objects": ["Account", "Opportunity"]
+  },
+  {
+    "id": "complex-002",
+    "question": "Find contacts at accounts with annual revenue over 1 million",
+    "soql": "SELECT Id, FirstName, LastName, Email, Account.Name FROM Contact WHERE Account.AnnualRevenue > 1000000",
+    "complexity": "medium",
+    "patterns": ["parent-lookup", "filter"],
+    "objects": ["Contact", "Account"]
+  },
+  {
+    "id": "complex-003",
+    "question": "Show opportunities with their products and account details",
+    "soql": "SELECT Id, Name, Account.Name, Account.Industry, (SELECT Id, Product2.Name, Quantity FROM OpportunityLineItems) FROM Opportunity",
+    "complexity": "complex",
+    "patterns": ["parent-lookup", "child-subquery", "join"],
+    "objects": ["Opportunity", "Account", "OpportunityLineItem", "Product2"]
+  },
+  {
+    "id": "complex-004",
+    "question": "Count open cases per account for accounts in California",
+    "soql": "SELECT Account.Name, COUNT(Id) FROM Case WHERE Account.BillingState = 'CA' AND IsClosed = false GROUP BY Account.Name",
+    "complexity": "complex",
+    "patterns": ["aggregate", "group-by", "parent-lookup", "filter"],
+    "objects": ["Case", "Account"]
+  },
+  {
+    "id": "complex-005",
+    "question": "Show accounts with their total opportunity pipeline and number of contacts",
+    "soql": "SELECT Id, Name, (SELECT Id, Amount FROM Opportunities WHERE IsClosed = false), (SELECT Id FROM Contacts) FROM Account",
+    "complexity": "complex",
+    "patterns": ["child-subquery", "filter"],
+    "objects": ["Account", "Opportunity", "Contact"],
+    "explanation": "Multiple child subqueries with filter in one query"
+  },
+  {
+    "id": "nullcheck-001",
+    "question": "Find contacts without an email address",
+    "soql": "SELECT Id, FirstName, LastName FROM Contact WHERE Email = null",
+    "complexity": "simple",
+    "patterns": ["filter"],
+    "objects": ["Contact"]
+  },
+  {
+    "id": "nullcheck-002",
+    "question": "Show opportunities without an account",
+    "soql": "SELECT Id, Name FROM Opportunity WHERE AccountId = null",
+    "complexity": "simple",
+    "patterns": ["filter"],
+    "objects": ["Opportunity"]
+  },
+  {
+    "id": "multi-filter-001",
+    "question": "Find high-value open opportunities from enterprise accounts",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity WHERE Amount > 50000 AND IsClosed = false AND Account.Type = 'Enterprise'",
+    "complexity": "medium",
+    "patterns": ["filter", "parent-lookup"],
+    "objects": ["Opportunity", "Account"]
+  },
+  {
+    "id": "multi-filter-002",
+    "question": "Show active contacts at accounts in the healthcare or finance industry",
+    "soql": "SELECT Id, FirstName, LastName, Email FROM Contact WHERE Account.Industry IN ('Healthcare', 'Finance') AND IsActive__c = true",
+    "complexity": "medium",
+    "patterns": ["filter", "parent-lookup", "in-clause"],
+    "objects": ["Contact", "Account"]
+  },
+  {
+    "id": "owner-001",
+    "question": "Show opportunities owned by John Smith",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity WHERE Owner.Name = 'John Smith'",
+    "complexity": "medium",
+    "patterns": ["parent-lookup", "filter"],
+    "objects": ["Opportunity", "User"]
+  },
+  {
+    "id": "owner-002",
+    "question": "Count opportunities per owner",
+    "soql": "SELECT Owner.Name, COUNT(Id) FROM Opportunity GROUP BY Owner.Name",
+    "complexity": "medium",
+    "patterns": ["aggregate", "group-by", "parent-lookup"],
+    "objects": ["Opportunity", "User"]
+  },
+  {
+    "id": "standard-001",
+    "question": "Show all products with their prices",
+    "soql": "SELECT Id, Name, ProductCode, (SELECT UnitPrice, Pricebook2.Name FROM PricebookEntries) FROM Product2",
+    "complexity": "medium",
+    "patterns": ["child-subquery", "parent-lookup"],
+    "objects": ["Product2", "PricebookEntry", "Pricebook2"]
+  },
+  {
+    "id": "standard-002",
+    "question": "List all users with their role",
+    "soql": "SELECT Id, Name, Email, UserRole.Name FROM User WHERE IsActive = true",
+    "complexity": "medium",
+    "patterns": ["parent-lookup", "filter"],
+    "objects": ["User", "UserRole"]
+  },
+  {
+    "id": "campaign-001",
+    "question": "Show campaigns with their members",
+    "soql": "SELECT Id, Name, (SELECT Id, ContactId, LeadId, Status FROM CampaignMembers) FROM Campaign",
+    "complexity": "medium",
+    "patterns": ["child-subquery"],
+    "objects": ["Campaign", "CampaignMember"]
+  },
+  {
+    "id": "campaign-002",
+    "question": "Count leads by campaign",
+    "soql": "SELECT Campaign.Name, COUNT(LeadId) FROM CampaignMember WHERE LeadId != null GROUP BY Campaign.Name",
+    "complexity": "medium",
+    "patterns": ["aggregate", "group-by", "parent-lookup", "filter"],
+    "objects": ["CampaignMember", "Campaign"]
+  },
+  {
+    "id": "record-type-001",
+    "question": "Show all accounts with Business record type",
+    "soql": "SELECT Id, Name FROM Account WHERE RecordType.DeveloperName = 'Business'",
+    "complexity": "medium",
+    "patterns": ["parent-lookup", "filter"],
+    "objects": ["Account", "RecordType"]
+  },
+  {
+    "id": "having-001",
+    "question": "Show accounts with more than 5 contacts",
+    "soql": "SELECT AccountId, Account.Name, COUNT(Id) FROM Contact GROUP BY AccountId, Account.Name HAVING COUNT(Id) > 5",
+    "complexity": "complex",
+    "patterns": ["aggregate", "group-by", "parent-lookup"],
+    "objects": ["Contact", "Account"],
+    "explanation": "HAVING clause to filter aggregated results"
+  },
+  {
+    "id": "junction-001",
+    "question": "Show opportunities where Jane Smith is a contact",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity WHERE Id IN (SELECT OpportunityId FROM OpportunityContactRole WHERE Contact.Name = 'Jane Smith')",
+    "complexity": "complex",
+    "patterns": ["subquery", "junction-table", "filter"],
+    "objects": ["Opportunity", "OpportunityContactRole", "Contact"],
+    "explanation": "OpportunityContactRole links Opportunities to Contacts (external people like customers/stakeholders)."
+  },
+  {
+    "id": "junction-002",
+    "question": "Find opportunities where Sarah Johnson is working on them",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity WHERE Id IN (SELECT OpportunityId FROM OpportunityTeamMember WHERE User.Name = 'Sarah Johnson')",
+    "complexity": "complex",
+    "patterns": ["subquery", "junction-table", "filter"],
+    "objects": ["Opportunity", "OpportunityTeamMember", "User"],
+    "explanation": "OpportunityTeamMember links Opportunities to Users (internal team members working on the deal). Use for 'working on', 'collaborating', 'team member' queries."
+  },
+  {
+    "id": "junction-003",
+    "question": "Find opportunities owned by John Doe where Sarah Johnson is also working",
+    "soql": "SELECT Id, Name, Amount FROM Opportunity WHERE Owner.Name = 'John Doe' AND Id IN (SELECT OpportunityId FROM OpportunityTeamMember WHERE User.Name = 'Sarah Johnson')",
+    "complexity": "complex",
+    "patterns": ["subquery", "junction-table", "filter", "parent-lookup"],
+    "objects": ["Opportunity", "User", "OpportunityTeamMember"],
+    "explanation": "Owner.Name filters by the primary owner (User). OpportunityTeamMember filters by additional internal users working on the deal."
+  },
+  {
+    "id": "junction-004",
+    "question": "List opportunities with their contact roles",
+    "soql": "SELECT Id, Name, (SELECT Id, Contact.Name, Role FROM OpportunityContactRoles) FROM Opportunity",
+    "complexity": "medium",
+    "patterns": ["child-subquery", "parent-lookup"],
+    "objects": ["Opportunity", "OpportunityContactRole", "Contact"],
+    "explanation": "Child subquery to get all contacts associated with each opportunity"
+  },
+  {
+    "id": "junction-005",
+    "question": "Show contacts and the opportunities they are involved in",
+    "soql": "SELECT Id, Name, (SELECT Opportunity.Name, Opportunity.Amount, Role FROM OpportunityContactRoles) FROM Contact",
+    "complexity": "medium",
+    "patterns": ["child-subquery", "parent-lookup"],
+    "objects": ["Contact", "OpportunityContactRole", "Opportunity"],
+    "explanation": "Reverse query: from Contact to their Opportunities via the junction table"
+  }
+]

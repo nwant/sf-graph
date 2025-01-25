@@ -1,0 +1,43 @@
+{
+  "metadataTypes": [
+    {
+      "name": "CustomObject",
+      "handler": "CustomObjectHandler",
+      "nodeLabel": "Object",
+      "identifier": ["apiName", "orgId"],
+      "properties": {
+        "apiName": { "indexed": true },
+        "orgId": { "indexed": true },
+        "category": { "indexed": true }
+      }
+    },
+    {
+      "name": "CustomField",
+      "handler": "CustomFieldHandler",
+      "nodeLabel": "Field",
+      "identifier": ["apiName", "sobjectType", "orgId"],
+      "properties": {
+        "apiName": { "indexed": true },
+        "sobjectType": { "indexed": true },
+        "orgId": { "indexed": true },
+        "type": { "indexed": true },
+        "referenceTo": { "indexed": true }
+      }
+    },
+    {
+      "name": "ValidationRule",
+      "handler": "ValidationRuleHandler",
+      "nodeLabel": "ValidationRule",
+      "identifier": ["fullName", "orgId"],
+      "properties": {
+        "fullName": { "indexed": true },
+        "orgId": { "indexed": true }
+      }
+    }
+  ],
+  "sync": {
+    "excludeSystemObjects": false,
+    "defaultCategories": ["standard", "custom", "metadata_type", "platform_event", "external"],
+    "excludedCategories": ["system"]
+  }
+}
